@@ -16,7 +16,6 @@ function calculateParityBit(encodedMessage, parityPosition) {
 function encodeMessage(data) {
 
     let lines = data.match(/.{1,4}/g);
-    console.log(lines);
 
     let encodedMessage = [];  
 

@@ -1,17 +1,9 @@
 // application.js
 
-import readline from 'readline';
-
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-export function solicitarMensaje() {
+export function solicitarMensaje(rl) {
     return new Promise((resolve) => {
         rl.question('Ingrese el mensaje a enviar: ', (mensaje) => {
             rl.question('Ingrese el algoritmo a utilizar (Fletcher/Hamming): ', (algoritmo) => {
-                rl.close();
                 resolve({ mensaje, algoritmo });
             });
         });

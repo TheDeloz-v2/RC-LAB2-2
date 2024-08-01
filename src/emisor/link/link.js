@@ -6,10 +6,10 @@ import { encodeMessage, decodeMessage } from '../Hamming.js';
 export function calcularIntegridad(mensajeBinario, algoritmo) {
     if (algoritmo === 'Fletcher') {
         const checksum = fletcher16(mensajeBinario);
-        return mensajeBinario + checksum;
+        return [mensajeBinario, checksum];
     } else if (algoritmo === 'Hamming') {
-        console.log(mensajeBinario);
-        return encodeMessage(mensajeBinario);
+        const encodedMessage = encodeMessage(mensajeBinario);
+        return [encodedMessage, ''];
     } else {
         throw new Error('Algoritmo no soportado');
     }

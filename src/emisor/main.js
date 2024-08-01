@@ -1,41 +1,71 @@
 import { solicitarMensaje, mostrarMensaje } from './application/application.js';
-import { enviarInformacion, recibirInformacion } from './transmission/transmission.js';
-import { codificarMensaje, decodificarMensaje } from './presentation/presentation.js';
-import { calcularIntegridad, verificarIntegridad } from './link/link.js';
+import { enviarInformacion } from './transmission/transmission.js';
+import { codificarMensaje } from './presentation/presentation.js';
+import { calcularIntegridad } from './link/link.js';
 import { aplicarRuido } from './ruido/ruido.js';
+import net from 'net';
+import dotenv from 'dotenv';
+import readline from 'readline';
 
 async function main() {
-    const { mensaje, algoritmo } = await solicitarMensaje();
-    
-    // Codificar mensaje
-    let mensajeBinario = codificarMensaje(mensaje);
-    
-    // Calcular integridad
-    mensajeBinario = calcularIntegridad(mensajeBinario, algoritmo);
-    console.log(mensajeBinario);
+    try {
+        dotenv.config();
+        const ip = process.env.SOCKET_IP || '127.0.0.1';
+        const port = process.env.SOCKET_PORT || 3000;
+        const noiseRate = process.env.NOISE_RATE || 0.1;
 
-    // Aplicar ruido
-    const tasaError = 0.01;
-    mensajeBinario = aplicarRuido(mensajeBinario, tasaError);
-    
-    // Enviar informacion
-    enviarInformacion(mensajeBinario);
-    
-    // Recibir informacion
-    let mensajeRecibido = await recibirInformacion();
-    
-    // Verificar integridad
-    let errorDetectado = verificarIntegridad(mensajeRecibido, algoritmo);
-    
-    // Decodificar mensaje
-    let mensajeDecodificado;
-    if (!errorDetectado) {
-        mensajeDecodificado = decodificarMensaje(mensajeRecibido);
-        mostrarMensaje(mensajeDecodificado);
-    } else {
-        mostrarMensaje('Error: No fue posible corregir los errores.');
+        const socket = new net.Socket();
+
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+
+        console.log('Awaiting server ' + ip + ':' + port);
+        socket.connect(port, ip, async () => {
+            console.log('Connected to server ' + ip + ':' + port);
+
+            while (true) {
+                const { mensaje, algoritmo } = await solicitarMensaje(rl);
+
+                if (mensaje === 'EXIT') {
+                    break;
+                }
+
+                // Codificar mensaje
+                let mensajeBinario = codificarMensaje(mensaje);
+
+                // Calcular integridad
+                mensajeBinario = calcularIntegridad(mensajeBinario, algoritmo);
+                console.log('Mensaje con integridad:', mensajeBinario);
+
+                // Aplicar ruido
+                if (algoritmo === 'Hamming') {
+                    mensajeBinario = aplicarRuido(mensajeBinario[0], noiseRate);
+                    console.log('Mensaje con ruido:', mensajeBinario);
+
+                } else if (algoritmo === 'Fletcher') {
+                    const mensajeBinarioRuido = aplicarRuido(mensajeBinario[0], noiseRate);
+                    const checksum = mensajeBinario[1];
+                    mensajeBinario = mensajeBinarioRuido+checksum;
+                    console.log('Mensaje con ruido:', mensajeBinarioRuido);
+                }
+
+                // Enviar información
+                enviarInformacion([algoritmo, mensajeBinario], socket);
+            }
+
+            socket.end();
+            rl.close();
+        });
+
+        socket.on('error', (err) => {
+            console.error('Error: ' + err);
+        });
+
+    } catch (err) {
+        console.error('Error:', err);
     }
 }
 
 main();
-
