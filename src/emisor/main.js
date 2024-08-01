@@ -34,6 +34,8 @@ async function main() {
 
                 // Codificar mensaje
                 let mensajeBinario = codificarMensaje(mensaje);
+                console.log('Mensaje codificado:', mensajeBinario);
+                console.log('Longitud mensaje:', mensajeBinario.length);
 
                 // Calcular integridad
                 mensajeBinario = calcularIntegridad(mensajeBinario, algoritmo);

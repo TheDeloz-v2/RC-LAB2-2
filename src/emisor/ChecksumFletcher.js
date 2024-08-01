@@ -6,7 +6,7 @@ function fletcher16(data) {
     let sum2 = 0;
     const modulus = 255;
 
-    const bytes = data.split(' ');
+    const bytes = data.match(/.{1,8}/g);
     
     for (let byte of bytes) {
         let value = parseInt(byte, 2); 
