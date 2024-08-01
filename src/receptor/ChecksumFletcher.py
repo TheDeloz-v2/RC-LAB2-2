@@ -13,16 +13,10 @@ def fletcher16(data):
     """
     sum1 = 0
     sum2 = 0
-    # Procesamos los datos en bytes (8 bits cada uno)
-    for i in range(0, len(data), 8):
-        byte = data[i:i+8]
-        if len(byte) < 8:
-            # Rellenar con ceros si el byte es menor a 8 bits
-            byte = byte.ljust(8, '0')
-        sum1 = (sum1 + int(byte, 2)) % 255
+    for byte in data:
+        sum1 = (sum1 + ord(byte)) % 255
         sum2 = (sum2 + sum1) % 255
-    fletch = (sum2 << 8) | sum1
-    return f'{fletch:04x}'
+    return f'{(sum2 << 8) | sum1:04x}'
 
 def checkReceiverChecksum(ReceivedMessage, Fletcher):
     """
@@ -42,7 +36,7 @@ def checkReceiverChecksum(ReceivedMessage, Fletcher):
 
     #Calculamos el checksum para los primeros 4 bits
     calculated_checksum = fletcher16(ReceivedMessage)
-
+    print(calculated_checksum)
     if Fletcher == calculated_checksum:
         return ReceivedMessage, 'No se detectaron errores'
     else:
@@ -52,7 +46,9 @@ def checkReceiverChecksum(ReceivedMessage, Fletcher):
 def main():
 
     # Verificar la integridad del mensaje
-    corrected_message, status = checkReceiverChecksum()
+    ReceivedMessage = '01001000010011110100110001000001'
+    Fletcher = '2e12'
+    corrected_message, status = checkReceiverChecksum(ReceivedMessage,Fletcher )
     
     if corrected_message:
         print(status)

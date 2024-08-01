@@ -21,4 +21,3 @@ def connection():
                 if not data:
                     break   #ya se recibio todo
                 print(f"Mensaje recibido: \n{data!r}\n{data!s}\n{data!a}") #!r !s !a, repr() str() ascii()
-                return data

@@ -1,3 +1,3 @@
 
-def mostrar_mensaje():
-    return 0
+def mostrar_mensaje(mensaje_final):
+    print("Mensaje enviado: " + mensaje_final + "\n")
