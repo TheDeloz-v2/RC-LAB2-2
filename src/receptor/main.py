@@ -22,15 +22,17 @@ def main():
             #accept() bloquea y deja esperando
             conn, addr = s.accept()
             with conn:
-                nombre, mensaje_binario, numero = recived_information(conn)
-                #recived_information(data[0],data[1],data[2])
-                mensaje_verificado = verificar_integridad(nombre, mensaje_binario, numero)
-                print("Estado del mensaje verificado: " + mensaje_verificado[1])
-                mensaje_corregido = corregir_mensaje(nombre, mensaje_verificado)
-                if mensaje_corregido[1] != 'Se detectaron errores: el mensaje se descarta':
-                    print("Mensaje corregido: " + mensaje_corregido[0])
-                    mensaje_final = decodificar_mensaje(mensaje_corregido[0])
-                    mostrar_mensaje(mensaje_final)
-                mostrar_mensaje(mensaje_corregido[1])
+                while True:
+                    nombre, mensaje_binario, numero = recived_information(conn)
+                    #recived_information(data[0],data[1],data[2])
+                    mensaje_verificado = verificar_integridad(nombre, mensaje_binario, numero)
+                    print("Estado del mensaje verificado: " + mensaje_verificado[1])
+                    mensaje_corregido = corregir_mensaje(nombre, mensaje_verificado)
+                    if mensaje_corregido[1] != 'Se detectaron errores: el mensaje se descarta':
+                        print("Mensaje corregido: " + mensaje_corregido[0])
+                        mensaje_final = decodificar_mensaje(mensaje_corregido[0])
+                        mostrar_mensaje(mensaje_final)
+                    else:
+                        mostrar_mensaje(mensaje_corregido[1])
 if __name__ == "__main__":
     main()

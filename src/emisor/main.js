@@ -12,7 +12,7 @@ async function main() {
         dotenv.config();
         const ip = process.env.SOCKET_IP || '127.0.0.1';
         const port = process.env.SOCKET_PORT || 3000;
-        const noiseRate = process.env.NOISE_RATE || 0.1;
+        const noiseRate = process.env.NOISE_RATE || 0;
 
         const socket = new net.Socket();
 
